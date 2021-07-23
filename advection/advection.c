@@ -26,21 +26,28 @@ int main(int argc, char **argv){
   int *itmax, *iout, *nnod, *nelem, *ibc;
   double *uu, *vv, *skx, *sky, *dt;
 
+  fprintf(stderr, "input\n");
   input(itmax, iout, dt, uu, vv, skx, sky, nnod, nelem, xx, yy, nc, ibc, nbc, fbc, amb, cc1, cc2, rmat);
 
+  fprintf(stderr, "init\n");
   init(nnod, cc1, cc2, amb, ibc, nbc, fbc);
 
+  fprintf(stderr, "matrix\n");
   matrix(nelem, nc, xx, yy, amb, uu, vv, skx, sky, rmat, dt);
 
   for(int istep = 0; istep < *itmax; istep++){
+    fprintf(stderr, "vec\n");
     vec(nnod, nelem, nc, rmat, cc1, cc2);
 
+    fprintf(stderr, "solve\n");
     solve(nnod, amb, cc2);
 
+    fprintf(stderr, "bound\n");
     bound(ibc, nbc, fbc, cc2);
 
     if(istep % (*iout) == 0) output(nnod, cc2, istep, dt);
 
+    fprintf(stderr, "change\n");
     change(nnod, cc1, cc2);
   }
 
@@ -54,15 +61,18 @@ void input(int* itmax, int* iout, double* dt, double* uu, double* vv, double* sk
   FILE *fp;
   int j;
 
-  fp = fopen("ad-dif.dat", "r");
+  fp = fopen("input.dat", "r");
 
+  fprintf(stderr, "flag1\n");
   fscanf(fp, "%d %d %lf", itmax, iout, dt);
+  fprintf(stderr, "flag2\n");
   fscanf(fp, "%lf %lf %lf %lf", uu, vv, skx, sky);
 
   fclose(fp);
 
-  fp = fopen("test/test.mes", "r");
+  fp = fopen("mesh.dat", "r");
 
+  fprintf(stderr, "flag2\n");
   fscanf(fp, "%d %d", nnod, nelem);
 
   xx = (double*)allocate_vector(sizeof(double), *nnod);
@@ -87,8 +97,9 @@ void input(int* itmax, int* iout, double* dt, double* uu, double* vv, double* sk
 
   fclose(fp);
 
-  fp = fopen("test/test.bc", "r");
+  fp = fopen("bc.dat", "r");
 
+  fprintf(stderr, "flag3\n");
   fscanf(fp, "%d", ibc);
   if(*ibc != 0){    
     nbc = (int*)allocate_vector(sizeof(int), *ibc);
