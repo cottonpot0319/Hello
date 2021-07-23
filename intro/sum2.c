@@ -23,9 +23,9 @@ int main(int argc, char **argv){
     ia = i - (myid * na);
     a[ia] = i + 1;
   }
-  if(myid == 1){
+  /*if(myid == 1){
     for(int i = ist; i < iet; i++) fprintf(stderr, "a[%d] = %d\n", i, a[i]);
-  }
+  }*/
 
   s = 0;
   ts = 0;
