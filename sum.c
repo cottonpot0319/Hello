@@ -19,19 +19,24 @@ int main(int argc, char **argv){
   ierr = MPI_Comm_size(MPI_COMM_WORLD, &numprocs);
   ierr = MPI_Comm_rank(MPI_COMM_WORLD, &myid);
 
-  fprintf(stderr, "myid = %d, numprocs = %d\n", myid, numprocs);
+  //fprintf(stderr, "myid = %d, numprocs = %d\n", myid, numprocs);
 
-  for(int i = 0; i < n; i++) a[i] = i;
+  for(int i = 0; i < n; i++) a[i] = i + 1;
+  if(myid == 0){
+    //for(int i = 0; i < 25; i++) fprintf(stderr, "a[%d] = %d\n", i, a[i]);
+  }
 
   s = 0;
   ts = 0;
   ipe = n / numprocs;
-  ist = 1 + myid * ipe;
+  ist = myid * ipe;
   iet = (myid + 1) * ipe;
+  fprintf(stderr, "myid = %d %d %d\n", myid, ist, iet);
 
-  for(int i = ist; ist < iet; ist++) s += a[i];
+  for(int i = ist; i < iet; i++) s += a[i];
+  //if(myid == 0) fprintf(stderr, "myid = %d %d\n", myid, s);
 
-  MPI_Reduce(&s, &ts, 1, MPI_INT, MPI_SUM, myid+1, MPI_COMM_WORLD);
+  ierr = MPI_Reduce(&s, &ts, 1, MPI_INT, MPI_SUM, 0, MPI_COMM_WORLD);
   fprintf(stderr, "myid = %d %d %d\n", myid, s, ts);
 
   ierr = MPI_Finalize();
